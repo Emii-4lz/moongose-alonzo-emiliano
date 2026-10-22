@@ -1,4 +1,4 @@
-import { model, Schema } from "mongoose";
+import { model, Schema, Types } from "mongoose";
 
 const profileSchema = new Schema({
     first_name: {
@@ -30,7 +30,12 @@ const profileSchema = new Schema({
             type: String,
             required: true,
         }
-    }]
+    }],
+    user: {
+        type: Types.ObjectId,
+        ref: "User",
+        required: true
+    }
 });
 
 export const profileModel = model("Profile", profileSchema);

@@ -2,10 +2,16 @@ import { profileModel } from "../models/profile.model.js";
 
 export const createProfile = async (req, res) => {
     try {
-        const { first_name, last_name, bio, address } = req.body;
-        const newProfile = await profileModel.create({first_name, last_name, bio, address})
+        const { first_name, last_name, bio, address, user } = req.body;
+        const newProfile = await profileModel.create({
+            first_name,
+            last_name,
+            bio,
+            address,
+            user: req.user?.id || user
+        });
 
-        return res.status(201).json({message: "Perfil creado satisfactoriamente!", data: newProfile})
+        return res.status(201).json({message: "Perfil creado satisfactoriamente!", data: newProfile});
     } catch (error) {
         console.log(error);
         return res.status(500).json({message: "Error interno del servidor."});
@@ -13,17 +19,14 @@ export const createProfile = async (req, res) => {
 };
 
 export const getAllProfiles = async (req, res) => {
-        try {
-            const profiles = await profileModel.find()
-
-            return res.status(200).json({
-                data: profiles
-            });
-        } catch (error) {
-            console.log(error);
-            return res.status(500).json({message: "Error interno del servidor."});
-        }
-    };
+    try {
+        const profiles = await profileModel.find().populate('user', 'username email');
+        return res.status(200).json({ data: profiles });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({message: "Error interno del servidor."});
+    }
+};
 
 export const updateProfile = async (req, res) => {
     try {
@@ -32,17 +35,15 @@ export const updateProfile = async (req, res) => {
 
         const updatedProfile = await profileModel.findByIdAndUpdate(
             id,
-            {bio, address},
-            {returnDocument: "after"},
-        );
+            { bio, address },
+            { returnDocument: "after" },
+        ).populate('user');
 
         if(!updatedProfile) {
-            return res.status(404).json({message: "No se ha encontrado el perfil."})
+            return res.status(404).json({message: "No se ha encontrado el perfil."});
         };
 
-        return res.status(200).json({
-            data: updatedProfile
-        })
+        return res.status(200).json({ data: updatedProfile });
     } catch (error) {
         console.log(error);
         return res.status(500).json({message: "Error interno del servidor."});
@@ -51,12 +52,11 @@ export const updateProfile = async (req, res) => {
 
 export const deleteProfile = async (req, res) => {
     try {
-        const { id } = req.params
-
+        const { id } = req.params;
         const deletedProfile = await profileModel.findByIdAndDelete(id);
 
         if(!deletedProfile) {
-            return res.status(404).json({message: "No se ha encontrado el perfil."})
+            return res.status(404).json({message: "No se ha encontrado el perfil."});
         };
 
         return res.status(200).json({message: "Perfil eliminado satisfactoriamente!", data: deletedProfile});
