@@ -1,14 +1,20 @@
 import { Router } from 'express';
-import { 
-    createUser, 
-    getAllUsers, 
-    updateUser, 
-    deleteUser 
+import {
+    createUser,
+    getAllUsers,
+    updateUser,
+    deleteUser
 } from '../controllers/user.controller.js';
+
+import {
+    userIdValidate,
+    createUserValidate,
+    updateUserValidate
+} from "../middlewares/user.validation.js"
 
 export const userRouter = Router();
 
-userRouter.post('/', createUser);
+userRouter.post('/', createUserValidate, createUser);
 userRouter.get('/', getAllUsers);
-userRouter.put('/:id', updateUser);
-userRouter.delete('/:id', deleteUser);
+userRouter.put('/:id', userIdValidate, updateUserValidate, updateUser);
+userRouter.delete('/:id', userIdValidate, deleteUser);

@@ -1,14 +1,20 @@
 import { Router } from 'express';
-import { 
-    createPost, 
-    getAllPosts, 
-    updatePost, 
-    deletePost 
+import {
+    createPost,
+    getAllPosts,
+    updatePost,
+    deletePost
 } from '../controllers/post.controller.js';
+
+import {
+    createPostValidate,
+    postIdValidate,
+    updatePostValidate
+} from '../middlewares/post.validation.js';
 
 export const postRouter = Router();
 
-postRouter.post('/', createPost);
+postRouter.post('/', createPostValidate, createPost);
 postRouter.get('/', getAllPosts);
-postRouter.put('/:id', updatePost);
-postRouter.delete('/:id', deletePost);
+postRouter.put('/:id', postIdValidate, updatePostValidate, updatePost);
+postRouter.delete('/:id', postIdValidate, deletePost);
